@@ -1,64 +1,87 @@
+class Day1:
+    zero_count = 0
+    passing_count = 0
+    dial_current = 50
 
-temp = 0
-other_count_of_zero = 0
-count_of_zero = 0
-dial_current = 50
-with open("day1_input.txt") as input:
+    def splitter(self, direction: str, count: int) -> int:
+        """
+        Designed to Perform the initial Subtraction and Addition then return the result.
+        :param direction: describes the direction the dial needs to turn
+        :param count: number of clicks needed to turn
+        :return: result of turning the dial
+        """
+        if direction == "L":
+            new_num = self.dial_current - count
+        elif direction == "R":
+            new_num = self.dial_current + count
+        else:
+            print("error")
+        return new_num
 
-    for x in input:
-        temp += 1
-        if temp == 200:
-            break
-        if "L" in x:
-            num = int(x[1:])
-            print(f"L:{num}")
-            new_num = dial_current - num
+    def zero_check(self, num: int) -> None:
+        """
+        Designed to check if the number ends on zero then Increment Zero count.
+        :param num: the number the dial is currently set to
+        """
+        if num == 0:
+            self.zero_count += 1
 
-            if new_num < 0:
-                while new_num < 0:
-                    new_num = new_num + 100
-                    print(f"WL-L:{new_num}")
-                    other_count_of_zero += 1
-                dial_current = new_num
+    def lap_counter(self, num: int) -> tuple[int,int]:
+        """
+        Counts the number of laps and returns the laps and remaining number of clicks
+        :param num: Number of clicks we need to turn the dial
+        :return: Number of laps we have completed around the dial, and remaining number of clicks
+        """
 
-                if dial_current == 0:
-                    count_of_zero += 1
-                    print(f"D{dial_current}*******")
+        # Aryas Example of a better  solution
+        """laps = num // 100
+        clicks = num % 100
+        return laps, clicks"""
 
-            else:
-                dial_current = new_num
-                print(f"D:{dial_current}-----")
+        # this will perform both the flor division and mod at the same time
+            #laps, clicks = divmod(num, 100)
 
-                if dial_current == 0:
-                    count_of_zero += 1
-                    print(f"D{dial_current}*******")
-                    other_count_of_zero += 1
+        # My Solution
+        laps = 0
+        while num > 99:
+            num -= 100
+            laps += 1
+        return laps, num
 
-        elif "R" in x:
-            num = int(x[1:])
-            print(f"R:{num}")
-            new_num = num + dial_current
+    def checker(self, num: int) -> int:
+        """
+        Checks if number is greater than or less than the Boundary and that it that is doesnt start on zero, then increment passing count by one.
+        :param num: Number of clicks
+        :return: Remaining clicks after Modulus
+        """
+        if (num <= 0 or num > 99) and self.dial_current != 0:
+            self.passing_count += 1
 
-            if new_num > 99:
-                while new_num > 99:
-                    new_num  = new_num - 100
-                    print(f"WL-R:{new_num}")
-                    other_count_of_zero += 1
-                dial_current = new_num
+        return num % 100
 
-                if dial_current == 0:
-                    count_of_zero += 1
-                    print(f"D:{dial_current}********")
+    def run(self):
+        """
+        Runs the Bulk of the code.
+        """
+        with open("day1_input.txt", "r") as f:
+            for x in f:
+                # separates the Direction and number from the Input.
+                direction = x[0]
+                clicks = int(x[1:])
 
-            else:
-                dial_current = new_num
-                print(f"D{dial_current}------")
+                # takes in the number of laps and clicks left over, increments the passing count by number of laps then passes clicks into the splitter function.
+                laps, clicks = self.lap_counter(clicks)
+                self.passing_count += laps
+                new_num = self.splitter(direction, clicks)
+                new_num = self.checker(new_num)
+                self.zero_check(new_num)
+                self.dial_current = new_num
 
-                if dial_current == 0:
-                    count_of_zero += 1
-                    print(f"D{dial_current}*******")
-                    other_count_of_zero += 1
 
-print(f"number of 0's:{count_of_zero}")
-print(f"number of other 0's:{other_count_of_zero}")
-#print(f"Total number of 0's:{count_of_zero + other_count_of_zero}")
+
+        # Prints the Final Results of the Code
+        print("Final Result 1: ", self.zero_count)
+        print("Final Result 2: ", self.passing_count)
+
+if __name__ == "__main__":
+    Day1().run()
