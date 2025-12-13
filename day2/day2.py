@@ -15,32 +15,37 @@ class Day2:
                 output_data.append(ids)
             return tuple(output_data)
 
-    def find_dupes(self, num_ranges):
+    def checker(self, number:int):
         """
-        Splits the numbers in half and compares the first half to the second half
-        :param num_ranges: Expects the tuple containing the number ranges.
+        Checks if the given number is a valid ID
+        :param number: Current number we are checking
         """
-        for x in num_ranges:
-            start = int(x[0])
-            end = int(x[1])
-            print(f"start: {start}, end: {end}")
-            for y in range(start, end + 1):
-                num_length = len(str(y))
-                current_id = str(y)
-                half_number = num_length / 2
+        num_str = str(number)
+        length = len(num_str)
+        current_digit_count = 0
+        if length == 1: return #skips any single digit IDs
 
-                #remove odd sized numbers
-                if int(num_length) % 2 == 0:
-
-                    #Checks if the first half of each number is the same as the second half
-                    if current_id[:int(half_number)] == current_id[int(half_number):]:
-                        self.result += int(current_id)
-                else:
-                    continue
+        for x in num_str:
+            current_digit_count += 1
+            current_set = num_str[:current_digit_count]
+            if current_set == num_str[current_digit_count:current_digit_count + current_digit_count]:
+                set_digits = len(current_set)
+                num_of_set = num_str.count(current_set)
+                ref_num, zero_check = divmod(length, set_digits)
+                if ref_num == num_of_set and zero_check == 0:
+                    self.result += number
+                    break
 
 
     def run(self):
-        self.find_dupes(self.id_range())
+        """
+        loops the numbers in a given ID range and checks if the number is valid
+        """
+        for x in self.id_range():
+            start = int(x[0])
+            end = int(x[1])
+            for y in range(start, end + 1):
+                self.checker(y)
         print(f"Final Result: {self.result}")
 
 
